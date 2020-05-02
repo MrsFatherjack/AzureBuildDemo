@@ -1,0 +1,13 @@
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_NULLS ON
+GO
+CREATE PROC [BUILD].[Get_TableNames]
+AS
+
+BEGIN
+
+SELECT tablename FROM build.tablelist
+
+END 
+GO
