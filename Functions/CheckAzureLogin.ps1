@@ -7,7 +7,7 @@ function Check-AzureLogin
     $needLogin = $true
     Try 
     {
-        $content = Get-AzureRmContext
+        $content = Get-AzContext
         if ($content) 
         {
             $needLogin = ([string]::IsNullOrEmpty($content.Account))
@@ -15,7 +15,7 @@ function Check-AzureLogin
     } 
     Catch 
     {
-        if ($_ -like "*Login-AzureRmAccount to login*") 
+        if ($_ -like "*Login-AZAccount to login*") 
         {
             $needLogin = $true
         } 
