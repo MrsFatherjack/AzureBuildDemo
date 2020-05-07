@@ -14,8 +14,8 @@ $Directory # Where passwords are stored
         Write-Verbose "Starting Build Process"
         [cmdletbinding()]
         <#
-        $LocaleID = 2
-        $SourceDirectory = "c:\gitdemo\azurebuilddemo\"
+        $LocaleID = 5
+        $SourceDirectory = "c:\github\azurebuilddemo\"
         $SourceServer = "babydell\monza"
         $SourceDatabase = "HUB"
         $Database = "MySports"
@@ -31,16 +31,15 @@ $Directory # Where passwords are stored
         ###################### Get project specific details #########################################
 
         write-verbose "Getting project specific details"
-        $Database = $database.ToLower()
-
+       
         $Svr = Get-LocaleSpecificDetails -SourceServer $SourceServer -SourceDatabase $SourceDatabase  -LocaleID $LocaleID
-
         $Username = $svr.UserName
         $AzureRegion = $svr.AzureRegion
         $LocaleName = $Svr.LocaleName
         $SubscriptionID = $Svr.subscriptionID
         $TenantID = $Svr.TenantID
         $Tier = $Svr.Tier
+        $Database = $database.ToLower()
 
         $AbrName = $LocaleName.replace(' ','')
         $ServerName = "$abrname" + "Server"
@@ -69,16 +68,18 @@ $Directory # Where passwords are stored
         $PortalUserPassword = convertto-securestring -string $PortalPassword -AsPlainText -Force
         $PortalCredential = New-Object -TypeName system.management.automation.pscredential -ArgumentList $PortalUser, $PortalUserPassword
 
+
         ###################### connect and login to portal #########################################
 
         Write-Verbose "Connecting to Azure Account"
         Check-AzureLogin -TenantID $TenantID -SubscriptionID $SubscriptionID -Credential $PortalCredential
 
         ########  Create a new resource group if it doesn't exist
-        $NotPresent = get-azurermresourcegroup -name $ResourceGroupName -erroraction silentlycontinue
+        #$NotPresent = get-azurermresourcegroup -name $ResourceGroupName -erroraction silentlycontinue
+        $NotPresent = get-AZResourceGroup -name $ResourceGroupName -erroraction silentlycontinue
         if (! $NotPresent) { #6
         write-verbose "Creating ResourceGroup"
-            new-azurermresourcegroup -name $ResourceGroupName -location $AzureRegion 
+            new-AZResourceGroup -name $ResourceGroupName -location $AzureRegion 
         } #6
         
         ########  Get the IP details to apply to the new server   ########
@@ -90,14 +91,14 @@ $Directory # Where passwords are stored
         $endip = $startip
 
         ########  Create a new server if it doesn't exist     ########
-            $sql = Get-AzureRmResource -ResourceName $ServerName -ResourceGroupName $ResourceGroupName
+            $sql = Get-AZResource -ResourceName $ServerName -ResourceGroupName $ResourceGroupName
             write-output $SQL
-            if (!$sql) { #7
+            if (! $sql) { #7
                     write-verbose "Creating server"
-                    New-AzureRmSqlServer -Location $AzureRegion -ServerName $ServerName -SqlAdministratorCredentials $AdminUserCredential -ResourceGroupName $ResourceGroupName -ServerVersion "12.0"
-                    New-AzureRmSqlServerFirewallRule -ResourceGroupName $ResourceGroupName -ServerName $ServerName -FirewallRuleName "AllowedIPs" -StartIpAddress $startip -EndIpAddress $endip
-                    New-AzureRmSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $ResourceGroupName -name "AllowAllWindowsAzureIps" -StartIpAddress "0.0.0.0" -EndIpAddress "0.0.0.0"
-                    New-AzureRmSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $ResourceGroupName -name "RandomIPForSync" -StartIpAddress "185.130.158.160" -EndIpAddress "185.130.158.160"
+                    New-AZSQLServer -Location $AzureRegion -ServerName $ServerName -SqlAdministratorCredentials $AdminUserCredential -ResourceGroupName $ResourceGroupName -ServerVersion "12.0"
+                    New-AZSqlServerFirewallRule -ResourceGroupName $ResourceGroupName -ServerName $ServerName -FirewallRuleName "AllowedIPs" -StartIpAddress $startip -EndIpAddress $endip
+                    New-AZSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $ResourceGroupName -name "AllowAllWindowsAzureIps" -StartIpAddress "0.0.0.0" -EndIpAddress "0.0.0.0"
+                    New-AZSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $ResourceGroupName -name "RandomIPForSync" -StartIpAddress "185.130.158.160" -EndIpAddress "185.130.158.160"
 
                 }
                 
@@ -106,9 +107,9 @@ $Directory # Where passwords are stored
 
             ###################### Build databases #########################################
             #write-output "Resource Group Name: $ResourceGroupName Server Name: $ServerName, Database: $Database"
-            $DBExists = Get-AzureRmSqldatabase -ServerName $Servername -ResourceGroupName $ResourceGroupname -DatabaseName $Database  -ErrorAction SilentlyContinue
+            $DBExists = Get-AZSqldatabase -ServerName $Servername -ResourceGroupName $ResourceGroupname -DatabaseName $Database  -ErrorAction SilentlyContinue
             if (! $DBExists) { #10
-                    New-AzureRmSqlDatabase -ResourceGroupName $resourcegroupname -ServerName $Servername -DatabaseName $Database -RequestedServiceObjectiveName  $Tier #-ErrorAction SilentlyContinue
+                    New-AZSqlDatabase -ResourceGroupName $resourcegroupname -ServerName $Servername -DatabaseName $Database -RequestedServiceObjectiveName  $Tier #-ErrorAction SilentlyContinue
                     write-Verbose "Built $Database"
             } #10
 
