@@ -8,7 +8,6 @@ CREATE TABLE [Person].[Address]
 [PostalCode] [nvarchar] (15) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 [SpatialLocation] [sys].[geography] NULL,
 [rowguid] [uniqueidentifier] NOT NULL,
-[ModifiedDate] [datetime] NOT NULL,
-[Country] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+[ModifiedDate] [datetime] NOT NULL
 ) ON [PRIMARY]
 GO
