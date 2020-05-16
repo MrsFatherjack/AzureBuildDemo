@@ -15,7 +15,7 @@ $Directory # Where passwords are stored
         [cmdletbinding()]
         <#
         $LocaleID = 2
-        $SourceDirectory = "c:\gitdemo\azurebuilddemo\"
+        $SourceDirectory = "c:\github\azurebuilddemo\"
         $SourceServer = "babydell\monza"
         $SourceDatabase = "HUB"
         $Database = "MySports"
@@ -75,10 +75,10 @@ $Directory # Where passwords are stored
         Check-AzureLogin -TenantID $TenantID -SubscriptionID $SubscriptionID -Credential $PortalCredential
 
         ########  Create a new resource group if it doesn't exist
-        $NotPresent = get-azurermresourcegroup -name $ResourceGroupName -erroraction silentlycontinue
+        $NotPresent = get-AZresourcegroup -name $ResourceGroupName -erroraction silentlycontinue
         if (! $NotPresent) { #6
         write-verbose "Creating ResourceGroup"
-            new-azurermresourcegroup -name $ResourceGroupName -location $AzureRegion 
+            new-AZresourcegroup -name $ResourceGroupName -location $AzureRegion 
         } #6
         
         ########  Get the IP details to apply to the new server   ########
@@ -90,14 +90,14 @@ $Directory # Where passwords are stored
         $endip = $startip
 
         ########  Create a new server if it doesn't exist     ########
-            $sql = Get-AzureRmResource -ResourceName $ServerName -ResourceGroupName $ResourceGroupName
-            write-output $SQL
+            $sql = Get-AZResource -ResourceName $ServerName -ResourceGroupName $ResourceGroupName
+            #write-output $SQL
             if (!$sql) { #7
                     write-verbose "Creating server"
-                    New-AzureRmSqlServer -Location $AzureRegion -ServerName $ServerName -SqlAdministratorCredentials $AdminUserCredential -ResourceGroupName $ResourceGroupName -ServerVersion "12.0"
-                    New-AzureRmSqlServerFirewallRule -ResourceGroupName $ResourceGroupName -ServerName $ServerName -FirewallRuleName "AllowedIPs" -StartIpAddress $startip -EndIpAddress $endip
-                    New-AzureRmSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $ResourceGroupName -name "AllowAllWindowsAzureIps" -StartIpAddress "0.0.0.0" -EndIpAddress "0.0.0.0"
-                    New-AzureRmSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $ResourceGroupName -name "RandomIPForSync" -StartIpAddress "185.130.158.160" -EndIpAddress "185.130.158.160"
+                    New-AZSqlServer -Location $AzureRegion -ServerName $ServerName -SqlAdministratorCredentials $AdminUserCredential -ResourceGroupName $ResourceGroupName #-ServerVersion "12.0"
+                    New-AZSqlServerFirewallRule -ResourceGroupName $ResourceGroupName -ServerName $ServerName -FirewallRuleName "AllowedIPs" -StartIpAddress $startip -EndIpAddress $endip
+                    New-AZSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $ResourceGroupName -name "AllowAllWindowsAzureIps" -StartIpAddress "0.0.0.0" -EndIpAddress "0.0.0.0"
+                    New-AZSqlServerFirewallRule -ServerName $ServerName -ResourceGroupName $ResourceGroupName -name "RandomIPForSync" -StartIpAddress "185.130.158.160" -EndIpAddress "185.130.158.160"
 
                 }
                 

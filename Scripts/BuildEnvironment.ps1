@@ -9,10 +9,10 @@ add-azurermaccount -Subscription $SubscriptionID -TenantId $TenantID
 
 $Start = get-date
 
-$LocaleID = 5
+$LocaleID = 2
 $SourceServer = "babydell\monza"
 $SourceDatabase = "Hub"
-$SourceDirectory = "C:\GitDemo\azurebuilddemo\"
+$SourceDirectory = "C:\GitHub\azurebuilddemo\"
 $DestDB = "MySports"
 $SourceDataLocaleID = 5
 $Directory = "c:\azure\passwords\"
