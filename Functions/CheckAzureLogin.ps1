@@ -15,7 +15,7 @@ function Check-AzureLogin
     } 
     Catch 
     {
-        if ($_ -like "*Login-AzureRmAccount to login*") 
+        if ($_ -like "*Login-AZAccount to login*") 
         {
             $needLogin = $true
         } 

@@ -31,16 +31,15 @@ $Directory # Where passwords are stored
         ###################### Get project specific details #########################################
 
         write-verbose "Getting project specific details"
-        $Database = $database.ToLower()
-
+       
         $Svr = Get-LocaleSpecificDetails -SourceServer $SourceServer -SourceDatabase $SourceDatabase  -LocaleID $LocaleID
-
         $Username = $svr.UserName
         $AzureRegion = $svr.AzureRegion
         $LocaleName = $Svr.LocaleName
         $SubscriptionID = $Svr.subscriptionID
         $TenantID = $Svr.TenantID
         $Tier = $Svr.Tier
+        $Database = $database.ToLower()
 
         $AbrName = $LocaleName.replace(' ','')
         $ServerName = "$abrname" + "Server"
@@ -68,6 +67,7 @@ $Directory # Where passwords are stored
         $PortalPassword = get-securepassword -Username $PasswordUser -Directory $Directory
         $PortalUserPassword = convertto-securestring -string $PortalPassword -AsPlainText -Force
         $PortalCredential = New-Object -TypeName system.management.automation.pscredential -ArgumentList $PortalUser, $PortalUserPassword
+
 
         ###################### connect and login to portal #########################################
 
@@ -106,9 +106,9 @@ $Directory # Where passwords are stored
 
             ###################### Build databases #########################################
             #write-output "Resource Group Name: $ResourceGroupName Server Name: $ServerName, Database: $Database"
-            $DBExists = Get-AzureRmSqldatabase -ServerName $Servername -ResourceGroupName $ResourceGroupname -DatabaseName $Database  -ErrorAction SilentlyContinue
+            $DBExists = Get-AZSqldatabase -ServerName $Servername -ResourceGroupName $ResourceGroupname -DatabaseName $Database  -ErrorAction SilentlyContinue
             if (! $DBExists) { #10
-                    New-AzureRmSqlDatabase -ResourceGroupName $resourcegroupname -ServerName $Servername -DatabaseName $Database -RequestedServiceObjectiveName  $Tier #-ErrorAction SilentlyContinue
+                    New-AZSqlDatabase -ResourceGroupName $resourcegroupname -ServerName $Servername -DatabaseName $Database -RequestedServiceObjectiveName  $Tier #-ErrorAction SilentlyContinue
                     write-Verbose "Built $Database"
             } #10
 
